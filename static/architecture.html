@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise HR AI System Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.4.0/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --text-dark: #111827;
+            --text-light: #4b5563;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 25px;
+        }
+        h2 {
+            margin-top: 50px;
+            font-size: 1.6rem;
+            color: #1f2937;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        p {
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+        .system-highlight {
+            background: #e0e7ff;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+        .mermaid-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+        }
+        ul.tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 0;
+            list-style: none;
+            margin-bottom: 40px;
+        }
+        ul.tech-stack li {
+            background: #f3f4f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #374151;
+            border: 1px solid var(--border);
+        }
+        .code-block {
+            background: #111827;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>HR Assistant: System Architecture</h1>
+    <div class="subtitle">A Comprehensive Technical Deep-Dive into the AI Orchestration Layer</div>
+
+    <ul class="tech-stack">
+        <li>Python 3 & FastAPI</li>
+        <li>LangChain & LangGraph</li>
+        <li>Google Gemini Generative AI</li>
+        <li>Qdrant Local Vector DB</li>
+        <li>Sentence Transformers</li>
+        <li>Vanilla Frontend & PyJWT</li>
+    </ul>
+
+    <h2>1. The Ingestion Pipeline (Offline Data Structuring)</h2>
+    <p>Before the application even starts, the system processes raw HR policy PDFs and builds a secure mathematical representation of your company's knowledge. This happens in <code>ingest.py</code> and the `ingestion/` module.</p>
+    <ul>
+        <li><strong>PDF Extraction & Cleaning:</strong> Standard text extraction strips out noise, headers, and footers to isolate raw policy definitions.</li>
+        <li><strong>Semantic Chunking:</strong> The text isn't randomly split by character count. It is intelligently split by headers and numbered policy sections to preserve the context of entire ideas.</li>
+        <li><strong>RBAC Metadata Tagging:</strong> <em>This is the core of our data security.</em> During chunking, the code reads the section title. If a section contains words like <em>"Executive"</em> or <em>"Compensation"</em>, it assigns a hardcoded array of `allowed_roles: ["manager", "executive"]`. If the text is a general policy, it gets tagged for all roles (including Guests).</li>
+        <li><strong>Vectorization:</strong> The text chunks and their security metadata are embedded using a HuggingFace <code>SentenceTransformer</code> and saved locally into the Qdrant database array.</li>
+    </ul>
+
+    <h2>2. System Topology Dashboard</h2>
+    <div class="mermaid-container">
+        <div class="mermaid">
+        graph TD
+            User([User HTTP Request]) --> Auth[JWT Authentication Middleware]
+            Auth --> GraphState[(Graph State Dictionary<br>username, role, chat_history)]
+            GraphState --> Triage[Gemini LLM: Semantic Router]
+            
+            Triage -- "RAG Intent" --> RetrieveNode[RAG: Qdrant Search]
+            RetrieveNode -- "Applies RBAC Filter" --> M1[(Qdrant DB)]
+            M1 --> ValidateNode{Gemini LLM: Validation Node}
+            
+            ValidateNode -- "Unsure context" --> Retry[Increment Loop Constraint]
+            Retry --> RetrieveNode
+            
+            ValidateNode -- "Confident" --> LLMNode[Gemini LLM: RAG Final Answer]
+            
+            Triage -- "Personal API Intent" --> ToolNode[Gemini LLM: React Sub-Agent]
+            ToolNode <--> DB[(Offline HR SQLite/Dict Memory)]
+            
+            Triage -- "High Risk Intent" --> SafetyNode[Escalation Hard Cutoff]
+            SafetyNode --> Tickets[(Human HR Ticketing Log)]
+        </div>
+    </div>
+
+    <h2>3. The Orchestration Layer: LangGraph Nodes</h2>
+    <p>We use LangGraph as our control plane because it treats Agent behavior like a mathematically dependable state-machine. Here is precisely how traffic flows through the graph structure.</p>
+
+    <h3>A. The Semantic Router (LLM Touchpoint #1)</h3>
+    <p>Unlike basic chatbots that dump everything into a vector search, our graph's entry point is a zero-shot classification LLM. We send the user's raw query to Gemini with severe system prompts. Gemini is instructed to output <strong>exactly one word:</strong> <code>RAG</code>, <code>API</code>, or <code>ESCALATE</code> based on the linguistic intent of the query.</p>
+
+    <h3>B. RAG & The Validation Loop (LLM Touchpoint #2)</h3>
+    <p>If the query is standard policy, it enters the traditional RAG cycle. First, Qdrant utilizes the user's role (extracted securely from the JWT payload) to enforce a rigid filter query. The retrieved documents are then passed to the <strong>Validation Node</strong>.</p>
+    <div class="system-highlight">
+        <strong>Why do we have a Validation Node?</strong> Retreival is inherently noisy. LLM Touchpoint #2 takes the User Question and the Qdrant Context and asks Gemini: <em>"Is this context sufficient to answer the question?"</em> If Gemini says "NO", LangGraph utilizes a conditional edge to throw away the noise, increment a retry counter, and force Qdrant to perform a deeper, more expansive search (increasing `k=3` up to `k=6`). This absolutely minimizes AI hallucinations!
+    </div>
+
+    <h3>C. RAG Generation (LLM Touchpoint #3)</h3>
+    <p>Only once the Validation Node approves the context does it reach the final <code>LLM Node</code>. Here, we feed the Chat History, the validated Qdrant Context, and the user's query into Gemini. The LLM is locked down with strict instructions: <em>"Answer precisely. If the context is empty, state you lack access."</em></p>
+
+    <h3>D. Agentic React Tooling (LLM Touchpoint #4)</h3>
+    <p>If the Semantic Router detects a personal question (e.g., <em>"What equipment do I have assigned?"</em>), the entire Qdrant cycle is bypassed. The traffic routes instantly to the <code>API Node</code>. This node instantiates a LangGraph prebuilt <strong>React Agent</strong>.</p>
+    <p>Because it is a React (Reasoning + Acting) Agent, we <em>bind</em> Python functions directly to Gemini's brain. Gemini looks at its toolbelt, selects the <code>get_assigned_equipment</code> tool, passes in the user's exact authenticated username, extracts the JSON payload from the mock HR Database, and synthesizes a perfectly contextual final answer.</p>
+
+    <h2>4. Human-in-the-Loop Safety Engineering (The Hard Cutoff)</h2>
+    <p>If the Semantic Router detects words like <em>"Harassment, Lawyer, Quit, Sue"</em> or an intent to <em>"Speak to a human"</em>, the graph forks immediately into the <code>Escalation Node</code>.</p>
+    <p><strong>This node intentionally avoids invoking an LLM for its response!</strong> Generative language models should not be legally trusted with severe employee disputes. Instead, this node executes a pure Python script to log a Support Ticket into <code>data/tickets.py</code> and returns an immutable, company-approved text string (alongside the ticket reference). It also flips an <code>is_escalation = true</code> flag in the FastAPI HTTP payload to trigger dynamic red-alert CSS styling on the frontend.</p>
+
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#eef2ff', primaryBorderColor: '#6366f1', primaryTextColor: '#111827', lineType: 'basis' }});
+</script>
+</body>
+</html>

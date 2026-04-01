@@ -1,0 +1,16 @@
+langchain
+langchain-core
+langchain-community
+langchain-huggingface
+langchain-google-genai
+langgraph
+pydantic
+pydantic-settings
+python-dotenv
+qdrant-client
+langchain-qdrant
+sentence-transformers
+pymupdf
+fastapi
+uvicorn
+PyJWT

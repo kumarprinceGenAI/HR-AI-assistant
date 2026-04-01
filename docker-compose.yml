@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  hr-assistant-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-box">
+            <h2>Select Your Identity</h2>
+            <p>Simulating Enterprise SSO</p>
+            <div class="login-buttons">
+                <button onclick="loginUser('alice', 'password')" class="btn-role">Alice (Standard Employee)</button>
+                <button onclick="loginUser('bob', 'password')" class="btn-role">Bob (Manager)</button>
+                <button onclick="loginUser('charlie', 'password')" class="btn-role">Charlie (Executive)</button>
+                <button onclick="closeLoginModal()" class="btn-role g-btn" style="background:var(--bg-light); border-color:#ccc;">Continue as Guest</button>
+            </div>
+            <p id="login-error" style="color: red; font-size: 0.8rem; margin-top: 10px;"></p>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div style="display: flex; align-items: center;">
+                    <div class="avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="header-info">
+                        <h1>HR Assistant</h1>
+                        <p id="auth-status-text">Role: Guest</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="/static/architecture.html" target="_blank" class="btn-role" style="text-decoration: none; padding: 6px 14px; font-size:0.85rem; background: #e0e7ff; color: #4f46e5; border-color: #c7d2fe;">Architecture</a>
+                    <button id="auth-toggle-btn" class="btn-role" style="padding: 6px 14px; font-size:0.85rem;" onclick="toggleAuth()">Login</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <div class="message assistant-message">
+                <p>Hello! I am your HR AI Assistant. I can answer questions about company policies, benefits, and guidelines. How can I help you today?</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+            <button id="send-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

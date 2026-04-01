@@ -1,0 +1,23 @@
+[
+    {
+        "ticket_id": "HR-16D52C",
+        "username": "charlie",
+        "issue": "I want to talk to a human about harassment.",
+        "status": "OPEN_ESCALATED",
+        "timestamp": "2026-03-31T13:49:55.723917"
+    },
+    {
+        "ticket_id": "HR-E1147E",
+        "username": "alice",
+        "issue": "i want to talk to human",
+        "status": "OPEN_ESCALATED",
+        "timestamp": "2026-03-31T14:31:34.408576"
+    },
+    {
+        "ticket_id": "HR-808DDD",
+        "username": "charlie",
+        "issue": "I need to talk to a human",
+        "status": "OPEN_ESCALATED",
+        "timestamp": "2026-04-01T16:30:16.986808"
+    }
+]
