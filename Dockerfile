@@ -23,5 +23,5 @@ COPY . .
 # Expose API port for Hugging Face Spaces (7860 is default)
 EXPOSE 7860
 
-# Run FastAPI app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run ingest script to build ephemeral Qdrant DB at runtime, then start FastAPI
+CMD python ingest.py && uvicorn main:app --host 0.0.0.0 --port 7860
