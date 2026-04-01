@@ -11,7 +11,7 @@ def create_vector_store(documents):
     If it exists, it will overwrite the collection.
     """
     embedding = GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004"
+        model="models/gemini-embedding-001"
     )
 
     # Qdrant running in local mode (saving data to a local directory)
@@ -33,7 +33,7 @@ def load_vector_store():
         raise FileNotFoundError(f"Qdrant dataset path '{QDRANT_PATH}' does not exist.")
 
     embedding = GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004"
+        model="models/gemini-embedding-001"
     )
 
     return QdrantVectorStore.from_existing_collection(
